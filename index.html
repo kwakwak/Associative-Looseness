@@ -9,6 +9,9 @@
         .video-link{
             cursor: pointer;
         }
+        .rtl {
+            direction: RTL;
+        }
     </style>
 </head>
 <body ng-app="al">
@@ -38,7 +41,7 @@
                 <td>{{$index}}</td>
                 <td>{{post.created_time | date}}</td>
                 <td>{{post.from.name}}</td>
-                <td>{{post.message}}</td>
+                <td class="rtl">{{post.message}}</td>
                 <td><img ng-src="{{post.picture}}" ng-if="post.source | youtubeFilter" class="video-link" ng-click="post.show=!post.show"></td>
             </tr>
             <tr ng-repeat-end ng-if="post.show">
