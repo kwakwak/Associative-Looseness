@@ -83,6 +83,19 @@
         };
     };
 
+    function youtubeFilter(){
+        return function(input){
+            var youtube = 'http://www.youtube.com/embed/';
+            var output;
+            if (input) {
+                if (input.substr(11,7) === 'youtube'){
+                    output = youtube+input.substr(25,11)+'?autoplay=1';
+                }
+            }
+            return output;
+        }
+    }
+
     angular.module('al',[])
         .controller({
             FeedController: ['FeedService','TokenService','StorageService',FeedController]
@@ -92,4 +105,13 @@
             FeedService    : ['$http',FeedService],
             StorageService : ['$window',StorageService]
         })
+        .filter ({
+            youtubeFilter  : [youtubeFilter]
+        })
+        .config(function($sceDelegateProvider) {
+            $sceDelegateProvider.resourceUrlWhitelist([
+                'self',
+                'http://www.youtube.com/**'
+            ]);
+    });
 }());
