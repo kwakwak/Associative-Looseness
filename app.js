@@ -3,6 +3,10 @@
 (function(){
     function FeedController(feed,token,storage){
 
+        this.status ={
+            loading : true
+        };
+
         /**
          * Bind feed to scope
          * @param token
@@ -10,6 +14,7 @@
         this.bindFeed = function(token){
             feed.get(token).success(function(feed){
                 this.data = feed.data;
+                this.status.loading = false;
             }.bind(this));
         }
 
