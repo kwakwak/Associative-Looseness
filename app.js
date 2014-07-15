@@ -62,7 +62,7 @@
          * @returns Promise
          */
         this.get = function(token){
-            var url = 'https://graph.facebook.com/v2.0/231120563712448/feed?' + token;
+            var url = 'https://graph.facebook.com/v2.0/231120563712448/feed?limit=50&' + token;
             return http.get(url);
         };
     }

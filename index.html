@@ -2,7 +2,8 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Associative Looseness</title>
     <!--<link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">-->
     <link href="http://bootswatch.com/darkly/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -12,12 +13,16 @@
         .rtl {
             direction: RTL;
         }
+        .center{
+            margin: 0px auto;
+            display: block;
+        }
     </style>
 </head>
 <body ng-app="al">
     <div ng-controller="FeedController as feed" class="container" >
 
-        <header class="row">
+        <header class="row hidden-xs">
             <div class="page-header">
                 <h1>Associative Looseness
                     <span class="glyphicon glyphicon-music pull-right"></span>
@@ -25,34 +30,37 @@
             </div>
         </header>
 
-        <img src="img/ajax-loader.gif" ng-show="feed.status.loading">
-        <!--<button class="button" ng-click="feed.clearToken()">Clear</button>-->
-        <table class="table table-striped table-bordered" ng-hide="feed.status.loading">
+        <img src="img/ajax-loader.gif"  ng-cloak class="center" ng-show="feed.status.loading">
+
+        <!-- Feed table-->
+        <table class="table table-striped table-bordered " ng-hide="feed.status.loading" ng-cloak>
             <thead>
             <tr>
-                <th>ID</th>
                 <th>Date</th>
                 <th>Name</th>
-                <th>Message</th>
+                <th class="hidden-xs">Message</th>
                 <th>Video</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat-start="post in feed.data" >
-                <td>{{$index}}</td>
+            <tr ng-repeat-start="post in feed.data" ng-if="post.source | youtubeFilter">
                 <td>{{post.created_time | date}}</td>
                 <td>{{post.from.name}}</td>
-                <td class="rtl">{{post.message}}</td>
-                <td><img ng-src="{{post.picture}}" ng-if="post.source | youtubeFilter" class="video-link" ng-click="post.show=!post.show"></td>
+                <td class="rtl hidden-xs" >{{post.message}}</td>
+                <td  class="text-center video-link" ng-click="post.show=!post.show">
+                    <img ng-src="{{post.picture}}">
+                    <h6>{{post.name}}</h6>
+                </td>
             </tr>
             <tr ng-repeat-end ng-if="post.show">
-                <td colspan="5"  class="text-center">
+                <td colspan="5" >
                     <iframe ng-src="{{post.source | youtubeFilter}}"
-                            frameborder="0" allowfullscreen width="560" height="315"></iframe>
+                            frameborder="0" allowfullscreen width="100%" height="200px"></iframe>
                 </td>
             </tr>
             </tbody>
         </table>
+        <!-- End Feed Table-->
 
     </div>
 <script src="bower_components/angular/angular.min.js"></script>
