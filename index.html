@@ -8,6 +8,9 @@
     <link href="http://bootswatch.com/darkly/bootstrap.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
     <style>
+        body{
+            background: url('img/dark-wood.jpg');
+        }
         .video-link{
             cursor: pointer;
         }
@@ -21,6 +24,13 @@
         h1{
             font-family: 'Oswald', sans-serif;
         }
+        .table{
+            background-color: #181818;
+        }
+        .table-hover>tbody>tr:hover>td{
+            background-color: black;
+        }
+
     </style>
 </head>
 <body ng-app="al">
@@ -40,32 +50,38 @@
 
 
         <!-- Feed table-->
-        <table class="table table-striped table-bordered " ng-hide="feed.status.loading" ng-cloak>
+        <table class="table table-striped table-bordered table-hover" ng-hide="feed.status.loading" ng-cloak>
             <thead>
             <tr>
-                <th><span class="glyphicon glyphicon-user"></span> User</th>
+                <th class="col-md-2"><span class="glyphicon glyphicon-user"></span> Recommend</th>
 
-                <th class="hidden-xs"><span class="glyphicon glyphicon-envelope"></span> Message</th>
+                <th class="hidden-xs"><span class="glyphicon glyphicon-envelope"></span> Text</th>
                 <th><span class="glyphicon glyphicon-play"></span> Video</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat-start="post in feed.data" ng-if="post.source | youtubeFilter">
+            <tr ng-repeat-start="post in feed.data"
+                ng-if="post.source | youtubeFilter"
+                ng-click="post.show=!post.show"
+                class="video-link"
+                >
                 <td>
+                    <h6>{{post.created_time | date}}</h6>
+                    <p><strong>{{post.from.name}}</strong></p>
 
-                    <p>{{post.from.name}}</p>
-                    <span class="badge">{{post.created_time | date}}</span>
                 </td>
                 <td class="rtl hidden-xs" >{{post.message}}</td>
-                <td  class="text-center video-link" ng-click="post.show=!post.show">
-                    <img ng-src="{{post.picture}}">
-                    <h6>{{post.name}}</h6>
+                <td class="text-center video-link">
+                        <img ng-src="{{post.picture}}">
+                        <h6>{{post.name}}</h6>
                 </td>
             </tr>
             <tr ng-repeat-end ng-if="post.show">
                 <td colspan="5" >
-                    <iframe ng-src="{{post.source | youtubeFilter}}"
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe ng-src="{{post.source | youtubeFilter}}" class="embed-responsive-item"
                             frameborder="0" allowfullscreen width="100%" height="200px"></iframe>
+                </div>
                 </td>
             </tr>
             </tbody>
