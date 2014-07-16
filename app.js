@@ -1,92 +1,96 @@
 
-
 (function(){
-    function FeedController(feed,token,storage){
+    /**
+     * Main Controller
+     * @param scope
+     * @constructor
+     */
+
+    function MainController(scope){
+        scope.$on('anEvent', ProcessEvent);
+
+        function ProcessEvent (event, data) {
+            scope.$broadcast('parentEvent', data);
+        }
+    }
+
+    /**
+     * Feed Controller
+     * @param scope
+     * @constructor
+     */
+    function FeedController(scope){
+        scope.$on('parentEvent',function(event,res){
+            switch(res.event) {
+                case 'ALfeed':
+                        this.data = res.fb.data;
+                        this.status.loading = false;
+                    break;
+                case 'logout':
+                        this.data = [];
+                        this.status.loading = true;
+                    break;
+            }
+        }.bind(this));
 
         this.status ={
             loading : true
         };
-
-        /**
-         * Bind feed to scope
-         * @param token
-         */
-        this.bindFeed = function(token){
-            feed.get(token).success(function(feed){
-                this.data = feed.data;
-                this.status.loading = false;
-            }.bind(this));
-        }
-
-        /**
-         * Search for the token in local storage
-         * if not exist get the token form facebook and save it.
-         */
-        var localToken = storage.loadToken();
-        if (localToken){
-            this.bindFeed(localToken);
-        } else {
-            token.get().success(function(token){
-                this.bindFeed(token);
-                storage.saveToken(token);
-            }.bind(this));
-        }
-
-        this.clearToken = function() {
-            storage.clearToken();
-        }
-    }
-
-    function TokenService(http){
-        /**
-         * Facebook access token
-         * @returns Promise
-         */
-        this.get = function(){
-            var url='https://graph.facebook.com/oauth/access_token';
-            return http.get(url,
-                {
-                params:{
-                    client_id     : '213438082188010' ,
-                    client_secret : '6ada08fc1074d6efb740d132dcd016a3' ,
-                    grant_type    : 'client_credentials'
-                }
-            });
-        };
-    }
-
-    function FeedService(http){
-        /**
-         * Group feed
-         * @param token
-         * @returns Promise
-         */
-        this.get = function(token){
-            var url = 'https://graph.facebook.com/v2.0/231120563712448/feed?limit=50&' + token;
-            return http.get(url);
-        };
-    }
-
-    function StorageService (w) {
-
-        this.saveToken = function (data) {
-            w.localStorage.setItem('token', JSON.stringify(data));
-            console.log('save:');
-            console.log(w.localStorage);
-        };
-
-        this.loadToken = function () {
-            console.log('load:');
-            console.log(w.localStorage);
-            return JSON.parse(w.localStorage.getItem('token'));
-        };
-
-        this.clearToken = function (data) {
-            w.localStorage.removeItem('token');
-            console.log('clear:');
-            console.log(w.localStorage);
-        };
     };
+
+    /**
+     * Facebook Controller
+     * @param ezfb
+     * @param scope
+     * @constructor
+     */
+
+    function FacebookController (ezfb,scope){
+
+        var getUser = function () {
+            ezfb.api('/me', function (res) {
+                this.user = res;
+            }.bind(this));
+        }.bind(this);
+
+
+        this.login = function () {
+            ezfb.login(function (res) {
+                if (res.authResponse) {
+                    getUser();
+                    this.getGroupFeed(231120563712448);
+                }
+            }.bind(this), {scope: 'user_groups'});
+        };
+
+        this.logout = function () {
+            ezfb.logout(function () {
+                this.user=false;
+                scope.$emit ('anEvent',{event: 'logout'});
+            }.bind(this));
+        }.bind(this);
+
+        this.getGroupFeed = function (groupID) {
+            ezfb.api('/'+groupID+'/feed/', function (res) {
+                scope.$emit ('anEvent',{
+                    event: 'ALfeed',
+                    fb: res
+                });
+            }.bind(this));
+        };
+
+        ezfb.getLoginStatus(function (res) {
+            if (res.authResponse){
+                getUser();
+                this.getGroupFeed(231120563712448);
+            }
+        }.bind(this));
+    };
+
+    /**
+     * Youtube filter
+     * @returns {Function}
+     */
 
     function youtubeFilter(){
         return function(input){
@@ -101,53 +105,11 @@
         }
     }
 
-    function FacebookController (ezfb){
-
-        var getUser = function () {
-            ezfb.api('/me', function (res) {
-                this.user = res;
-            }.bind(this));
-        }.bind(this);
-
-
-
-        /**
-         * API Functions
-         */
-
-        this.login = function () {
-            ezfb.login(function (res) {
-                if (res.authResponse) {
-                    getUser();
-                }
-            }, {scope: 'user_groups'});
-        };
-
-        this.login();
-
-        this.logout = function () {
-            ezfb.logout(function () {
-                this.user=false;
-            }.bind(this));
-        }.bind(this);
-
-        this.getGroupFeed = function () {
-            ezfb.api('/231120563712448/feed/', function (res) {
-               console.log(res);
-            }.bind(this));
-        }
-    };
-
-
     angular.module('al',['ezfb'])
         .controller({
-            FeedController: ['FeedService','TokenService','StorageService',FeedController],
-            FacebookController: ['ezfb' , FacebookController]
-        })
-        .service({
-            TokenService   : ['$http',TokenService],
-            FeedService    : ['$http',FeedService],
-            StorageService : ['$window',StorageService]
+            MainController: ['$scope',MainController],
+            FeedController: ['$scope',FeedController],
+            FacebookController: ['ezfb','$scope' , FacebookController]
         })
         .filter ({
             youtubeFilter  : [youtubeFilter]

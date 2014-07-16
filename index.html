@@ -38,10 +38,12 @@
             left: 0;
             right: 0;
         }
-
+        .navbar-default{
+           background-color: black;
+        }
     </style>
 </head>
-<body ng-app="al">
+<body ng-app="al" ng-controller="MainController">
 
     <div ng-controller="FacebookController as fb">
         <nav class="navbar navbar-default">
@@ -67,14 +69,6 @@
 
         <!-- Feed table-->
         <table class="table table-striped table-bordered table-hover" ng-hide="feed.status.loading" ng-cloak>
-            <thead>
-            <tr>
-                <th class="col-md-2"><span class="glyphicon glyphicon-user"></span></th>
-
-                <th class="hidden-xs"><span class="glyphicon glyphicon-envelope"></span> </th>
-                <th><span class="glyphicon glyphicon-play"></span> </th>
-            </tr>
-            </thead>
             <tbody>
             <tr ng-repeat-start="post in feed.data"
                 ng-if="post.source | youtubeFilter"
