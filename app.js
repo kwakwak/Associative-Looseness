@@ -51,6 +51,10 @@
             ezfb.api('/me', function (res) {
                 this.user = res;
             }.bind(this));
+
+            ezfb.api('/me/groups', function (res) {
+                this.groups = res.data;
+            }.bind(this));
         }.bind(this);
 
 

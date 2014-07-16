@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Associative Looseness</title>
     <!--<link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">-->
-    <link href="http://bootswatch.com/darkly/bootstrap.min.css" rel="stylesheet">
+    <link href="http://bootswatch.com/cyborg/bootstrap.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
     <style>
-        body{
-            background-color: black;
-            background: url('img/dark-wood.jpg');
-        }
+
         .video-link{
             cursor: pointer;
         }
@@ -25,12 +22,7 @@
         .navbar-brand{
             font-family: 'Oswald', sans-serif;
         }
-        .table{
-            background-color: #181818;
-        }
-        .table-hover>tbody>tr:hover>td{
-            background-color: black;
-        }
+
         .innerLoader{
             position: absolute;
             margin-left: auto;
@@ -38,9 +30,7 @@
             left: 0;
             right: 0;
         }
-        .navbar-default{
-           background-color: black;
-        }
+
     </style>
 </head>
 <body ng-app="al" ng-controller="MainController">
@@ -50,11 +40,17 @@
             <div class="container">
 
                 <div class="navbar-header">
-                    <a href="#" class="navbar-brand">Associative Looseness</a>
+                    <a href="#" class="navbar-brand" ng-click="fb.getGroupFeed(231120563712448)">Associative Looseness</a>
                 </div>
 
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#" ng-click="fb.getGroupFeed()">Group Feed</a></li>
+                <ul class="nav navbar-nav " ng-show="fb.user">
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">More groups <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="group in fb.groups" ><a href="#" ng-click="fb.getGroupFeed(group.id)">{{group.name}}</a>
+                        </ul>
+                    </li>
                 </ul>
 
                <p class="navbar-text navbar-right" ng-show="fb.user">{{fb.user.name}} <a href="#" class="navbar-link" ng-click="fb.logout()"> Logout</a></p>
@@ -65,7 +61,11 @@
 
     <div class="container"  ng-controller="FeedController as feed">
 
-        <img src="img/ajax-loader.gif" class="center"  ng-show="feed.status.loading">
+        <div class="center text-center"  ng-show="feed.status.loading">
+            <h5>You are not logged in</h5>
+            <img src="img/ajax-loader.gif" >
+        </div>
+
 
         <!-- Feed table-->
         <table class="table table-striped table-bordered table-hover" ng-hide="feed.status.loading" ng-cloak>
@@ -76,7 +76,7 @@
                 class="video-link"
                 >
                 <td>
-                    <h6>{{post.created_time | date}}</h6>
+                    <small>{{post.created_time | date}}</small>
                     <p><strong>{{post.from.name}}</strong></p>
 
                 </td>
@@ -101,7 +101,8 @@
 
     </div>
 
-
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/bootstrap/js/dropdown.js"></script>
 <script src="bower_components/angular/angular.min.js"></script>
 <script src="bower_components/angular-easyfb/angular-easyfb.min.js"></script>
 <script src="app.js"></script>
