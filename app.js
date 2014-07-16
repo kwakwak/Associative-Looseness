@@ -101,9 +101,48 @@
         }
     }
 
-    angular.module('al',[])
+    function FacebookController (ezfb){
+
+        var getUser = function () {
+            ezfb.api('/me', function (res) {
+                this.user = res;
+            }.bind(this));
+        }.bind(this);
+
+
+
+        /**
+         * API Functions
+         */
+
+        this.login = function () {
+            ezfb.login(function (res) {
+                if (res.authResponse) {
+                    getUser();
+                }
+            }, {scope: 'user_groups'});
+        };
+
+        this.login();
+
+        this.logout = function () {
+            ezfb.logout(function () {
+                this.user=false;
+            }.bind(this));
+        }.bind(this);
+
+        this.getGroupFeed = function () {
+            ezfb.api('/231120563712448/feed/', function (res) {
+               console.log(res);
+            }.bind(this));
+        }
+    };
+
+
+    angular.module('al',['ezfb'])
         .controller({
-            FeedController: ['FeedService','TokenService','StorageService',FeedController]
+            FeedController: ['FeedService','TokenService','StorageService',FeedController],
+            FacebookController: ['ezfb' , FacebookController]
         })
         .service({
             TokenService   : ['$http',TokenService],
@@ -113,10 +152,17 @@
         .filter ({
             youtubeFilter  : [youtubeFilter]
         })
-        .config(function($sceDelegateProvider) {
+        .config(function($sceDelegateProvider,ezfbProvider) {
             $sceDelegateProvider.resourceUrlWhitelist([
                 'self',
                 'http://www.youtube.com/**'
             ]);
-    });
+
+            ezfbProvider.setLocale('en_US');
+            ezfbProvider.setInitParams({
+                appId: '213438082188010',
+                version: 'v2.0'
+            });
+
+        });
 }());

@@ -14,6 +14,7 @@
   ],
   "dependencies": {
     "angular": "~1.2.20",
-    "bootstrap": "~3.2.0"
+    "bootstrap": "~3.2.0",
+    "angular-easyfb": "~1.1.0"
   }
 }
