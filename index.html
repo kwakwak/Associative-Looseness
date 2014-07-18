@@ -69,6 +69,7 @@
 
 
         <!-- Feed table-->
+        <p ng-hide="feed.data.length">This group does not like music.<p>
         <table class="table table-striped table-bordered table-hover" ng-hide="feed.status.loading" ng-cloak>
             <tbody empty-msg>
             <tr ng-repeat-start="post in feed.data"
