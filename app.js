@@ -19,7 +19,7 @@
      * @param scope
      * @constructor
      */
-    function FeedController(scope){
+    function FeedController(scope,youtube){
 
         this.status ={
             loading : true,
@@ -29,7 +29,7 @@
         scope.$on('parentEvent',function(event,res){
             switch(res.event) {
                 case 'ALfeed':
-                        this.data = res.fb.data;
+                        this.data = youtube.filter(res.fb.data);
                         this.status.loading = false;
                         this.status.count = 0;
                     break;
@@ -115,25 +115,41 @@
         }
     };
 
-
-    function emptyMsg() {
-        function link(scope, element, attrs) {
-            console.log (element);
-        }
-
+    function youtubeFactory(log){
         return {
-            link: link
-        };
+            filter : function (feed){
+                var out =[];
+                angular.forEach(feed,function(post,key){
+                    if (angular.isDefined(post.source)){
+                        if (post.source.substr(11,7) === 'youtube'){
+                            out.push(post);
+                        }
+                    }
+                });
+                return (out);
+            }
+        }
     }
+
+
+//    function emptyMsg() {
+//        function link(scope, element, attrs) {
+//            console.log (element);
+//        }
+//
+//        return {
+//            link: link
+//        };
+//    }
 
     angular.module('al',['ezfb'])
         .controller({
             MainController: ['$scope',MainController],
-            FeedController: ['$scope',FeedController],
+            FeedController: ['$scope','youtubeFactory',FeedController],
             FacebookController: ['ezfb','$scope' , FacebookController]
         })
         .filter ({
-            youtubeFilter: [youtubeFilter]
+            youtubeFilter: ['$log',youtubeFilter]
         })
         .config(function($sceDelegateProvider,ezfbProvider) {
             $sceDelegateProvider.resourceUrlWhitelist([
@@ -148,8 +164,11 @@
             });
 
         })
-       .directive({
-           emptyMsg: [emptyMsg]
+//        .directive({
+//           emptyMsg: [emptyMsg]
+//        })
+        .factory({
+            youtubeFactory : ['$log',youtubeFactory]
         });
 
 }());
