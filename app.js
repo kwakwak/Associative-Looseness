@@ -20,11 +20,18 @@
      * @constructor
      */
     function FeedController(scope){
+
+        this.status ={
+            loading : true,
+            count: 0
+        };
+
         scope.$on('parentEvent',function(event,res){
             switch(res.event) {
                 case 'ALfeed':
                         this.data = res.fb.data;
                         this.status.loading = false;
+                        this.status.count = 0;
                     break;
                 case 'logout':
                         this.data = [];
@@ -32,10 +39,6 @@
                     break;
             }
         }.bind(this));
-
-        this.status ={
-            loading : true
-        };
     };
 
     /**
@@ -62,7 +65,7 @@
             ezfb.login(function (res) {
                 if (res.authResponse) {
                     getUser();
-                    this.getGroupFeed(231120563712448);
+                    this.getGroupFeed(231120563712448,'Associative Looseness');
                 }
             }.bind(this), {scope: 'user_groups'});
         };
@@ -74,7 +77,10 @@
             }.bind(this));
         }.bind(this);
 
-        this.getGroupFeed = function (groupID) {
+        
+
+        this.getGroupFeed = function (groupID,groupName) {
+            this.groupName = groupName;
             ezfb.api('/'+groupID+'/feed/', function (res) {
                 scope.$emit ('anEvent',{
                     event: 'ALfeed',
@@ -86,7 +92,7 @@
         ezfb.getLoginStatus(function (res) {
             if (res.authResponse){
                 getUser();
-                this.getGroupFeed(231120563712448);
+                this.getGroupFeed(231120563712448,'Associative Looseness');
             }
         }.bind(this));
     };
@@ -107,6 +113,17 @@
             }
             return output;
         }
+    };
+
+
+    function emptyMsg() {
+        function link(scope, element, attrs) {
+            console.log (element);
+        }
+
+        return {
+            link: link
+        };
     }
 
     angular.module('al',['ezfb'])
@@ -116,7 +133,7 @@
             FacebookController: ['ezfb','$scope' , FacebookController]
         })
         .filter ({
-            youtubeFilter  : [youtubeFilter]
+            youtubeFilter: [youtubeFilter]
         })
         .config(function($sceDelegateProvider,ezfbProvider) {
             $sceDelegateProvider.resourceUrlWhitelist([
@@ -130,5 +147,9 @@
                 version: 'v2.0'
             });
 
+        })
+       .directive({
+           emptyMsg: [emptyMsg]
         });
+
 }());
